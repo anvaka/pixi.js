@@ -4,36 +4,55 @@
 
 
 /**
- * Need to finalize this a bit more but works! Its in but will be working on this feature properly next..:)
- * @class CustomRenderable 
+ * This object is one that will allow you to specify custom rendering functions based on render type
+ *
+ * @class CustomRenderable
  * @extends DisplayObject
  * @constructor
  */
 PIXI.CustomRenderable = function()
 {
-	PIXI.DisplayObject.call( this );
-	
-}
+    PIXI.DisplayObject.call( this );
+
+    this.renderable = true;
+};
 
 // constructor
-PIXI.CustomRenderable.constructor = PIXI.CustomRenderable;
 PIXI.CustomRenderable.prototype = Object.create( PIXI.DisplayObject.prototype );
+PIXI.CustomRenderable.prototype.constructor = PIXI.CustomRenderable;
 
-PIXI.CustomRenderable.prototype.renderCanvas = function(renderer)
+/**
+ * If this object is being rendered by a CanvasRenderer it will call this callback
+ *
+ * @method renderCanvas
+ * @param renderer {CanvasRenderer} The renderer instance
+ */
+PIXI.CustomRenderable.prototype.renderCanvas = function()
 {
-	// override!
-}
+    // override!
+};
 
-
-PIXI.CustomRenderable.prototype.initWebGL = function(renderer)
+/**
+ * If this object is being rendered by a WebGLRenderer it will call this callback to initialize
+ *
+ * @method initWebGL
+ * @param renderer {WebGLRenderer} The renderer instance
+ */
+PIXI.CustomRenderable.prototype.initWebGL = function()
 {
-	// override!
-}
+    // override!
+};
 
-
-PIXI.CustomRenderable.prototype.renderWebGL = function(renderGroup, projectionMatrix)
+/**
+ * If this object is being rendered by a WebGLRenderer it will call this callback
+ *
+ * @method renderWebGL
+ * @param rendererGroup {WebGLRenderGroup} The renderer group instance
+ * @param projectionMatrix {Matrix} The object's projection matrix
+ */
+PIXI.CustomRenderable.prototype.renderWebGL = function()
 {
-	// not sure if both needed? but ya have for now!
-	// override!
-}
+    // not sure if both needed? but ya have for now!
+    // override!
+};
 

@@ -10,9 +10,9 @@
 			background-color: #000000;
 		}
 	</style>
-	
-	
-	<script src="pixi.js"></script>
+
+
+	<script src="../../bin/pixi.dev.js"></script>
 </head>
 <body>
 	<script>
@@ -39,9 +39,31 @@
         s.parentNode.insertBefore(wf, s);
       })();
 
+	function runList(item)
+	{
+		console.log(">>>>>>>>>")
+		console.log("_")
+		var safe = 0;
+		var tmp = item;
+		while(tmp._iNext)
+		{
+			safe++;
+	//		console.log(tmp.childIndex + tmp);
+			tmp = tmp._iNext;
+			console.log(tmp);//.childIndex);
+		//	console.log(tmp);
+
+			if(safe > 100)
+			{
+				console.log("BREAK")
+				break
+			}
+		}
+	}
+
     function init()
     {
-        var assetsToLoader = ["desyrel.fnt"];
+        var assetsToLoader = ["desyrel.xml"];
 
         // create a new loader
         var loader = new PIXI.AssetLoader(assetsToLoader);
@@ -50,6 +72,10 @@
         loader.onComplete = onAssetsLoaded;
 
         //begin load
+
+        	// create an new instance of a pixi stage
+		var stage = new PIXI.Stage(0x66FF99);
+
         loader.load();
         function onAssetsLoaded()
         {
@@ -57,11 +83,13 @@
             bitmapFontText.position.x = 620 - bitmapFontText.width - 20;
             bitmapFontText.position.y = 20;
 
-            stage.addChild(bitmapFontText);
+			runList(bitmapFontText)
+	           stage.addChild(bitmapFontText);
+
+
         }
 
-		// create an new instance of a pixi stage
-		var stage = new PIXI.Stage(0x66FF99);
+
 
 		// add a shiney background..
 		var background = PIXI.Sprite.fromImage("textDemoBG.jpg");
@@ -91,10 +119,11 @@
 		countingText.position.x = 620 / 2;
 		countingText.position.y = 320;
 		countingText.anchor.x = 0.5;
-		
+
 		stage.addChild(textSample);
 		stage.addChild(spinningText);
 		stage.addChild(countingText);
+
 		var count = 0;
 		var score = 0;
 
@@ -108,16 +137,16 @@
 				score++;
 				// update the text...
 				countingText.setText("COUNT 4EVAR: " + score);
-				
+
 			}
 		    // just for fun, lets rotate the text
 		    spinningText.rotation += 0.03;
-			
-		    // render the stage   
+
+		    // render the stage
 		    renderer.render(stage);
 		}
 	}
-	   
+
 	</script>
 
 	</body>

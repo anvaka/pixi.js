@@ -5,89 +5,138 @@
 
 // MIT license
 
+/**
+ * A polyfill for requestAnimationFrame
+ *
+ * @method requestAnimationFrame
+ */
+/**
+ * A polyfill for cancelAnimationFrame
+ *
+ * @method cancelAnimationFrame
+ */
+var lastTime = 0;
+var vendors = ['ms', 'moz', 'webkit', 'o'];
+for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+    window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+    window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||
+        window[vendors[x] + 'CancelRequestAnimationFrame'];
+}
 
-    var lastTime = 0;
-    var vendors = ['ms', 'moz', 'webkit', 'o'];
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
-                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
-    }
+if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = function(callback) {
+        var currTime = new Date().getTime();
+        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+        var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+          timeToCall);
+        lastTime = currTime + timeToCall;
+        return id;
+    };
+}
 
-    if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback, element) {
-            var currTime = new Date().getTime();
-            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
-              timeToCall);
-            lastTime = currTime + timeToCall;
-            return id;
-        };
-
-    if (!window.cancelAnimationFrame)
-        window.cancelAnimationFrame = function(id) {
-            clearTimeout(id);
-        };
+if (!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame = function(id) {
+        clearTimeout(id);
+    };
+}
 
 window.requestAnimFrame = window.requestAnimationFrame;
 
-function HEXtoRGB(hex) {
-	return [(hex >> 16 & 0xFF) / 255, ( hex >> 8 & 0xFF) / 255, (hex & 0xFF)/ 255];
+/**
+ * Converts a hex color number to an [R, G, B] array
+ *
+ * @method hex2rgb
+ * @param hex {Number}
+ */
+PIXI.hex2rgb = function hex2rgb(hex) {
+    return [(hex >> 16 & 0xFF) / 255, ( hex >> 8 & 0xFF) / 255, (hex & 0xFF)/ 255];
+};
+
+/**
+ * A polyfill for Function.prototype.bind
+ *
+ * @method bind
+ */
+if (typeof Function.prototype.bind !== 'function') {
+    Function.prototype.bind = (function () {
+        var slice = Array.prototype.slice;
+        return function (thisArg) {
+            var target = this, boundArgs = slice.call(arguments, 1);
+
+            if (typeof target !== 'function') throw new TypeError();
+
+            function bound() {
+                var args = boundArgs.concat(slice.call(arguments));
+                target.apply(this instanceof bound ? this : thisArg, args);
+            }
+
+            bound.prototype = (function F(proto) {
+                if (proto) F.prototype = proto;
+                if (!(this instanceof F)) return new F();
+            })(target.prototype);
+
+            return bound;
+        };
+    })();
 }
 
 /**
- * Provides bind in a cross browser way.
+ * A wrapper for ajax requests to be handled cross browser
+ *
+ * @class AjaxRequest
+ * @constructor
  */
-if (typeof Function.prototype.bind != 'function') {
-  Function.prototype.bind = (function () {
-    var slice = Array.prototype.slice;
-    return function (thisArg) {
-      var target = this, boundArgs = slice.call(arguments, 1);
- 
-      if (typeof target != 'function') throw new TypeError();
- 
-      function bound() {
-	var args = boundArgs.concat(slice.call(arguments));
-	target.apply(this instanceof bound ? this : thisArg, args);
-      }
- 
-      bound.prototype = (function F(proto) {
-          proto && (F.prototype = proto);
-          if (!(this instanceof F)) return new F;          
-	})(target.prototype);
- 
-      return bound;
-    };
-  })();
-}
-
-var AjaxRequest = PIXI.AjaxRequest = function()
+PIXI.AjaxRequest = function AjaxRequest()
 {
-	var activexmodes = ["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] //activeX versions to check for in IE
-	
-	if (window.ActiveXObject)
-	{ //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
-		for (var i=0; i<activexmodes.length; i++)
-		{
-			try{
-				return new ActiveXObject(activexmodes[i])
-			}
-   			catch(e){
-    			//suppress error
-   			}
-		}
-	}
-	else if (window.XMLHttpRequest) // if Mozilla, Safari etc
-  	{
-  		return new XMLHttpRequest()
- 	}
- 	else
- 	{
-		return false;
- 	}
-}
+    var activexmodes = ['Msxml2.XMLHTTP.6.0', 'Msxml2.XMLHTTP.3.0', 'Microsoft.XMLHTTP']; //activeX versions to check for in IE
 
+    if (window.ActiveXObject)
+    { //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
+        for (var i=0; i<activexmodes.length; i++)
+        {
+            try{
+                return new window.ActiveXObject(activexmodes[i]);
+            }
+            catch(e) {
+                //suppress error
+            }
+        }
+    }
+    else if (window.XMLHttpRequest) // if Mozilla, Safari etc
+    {
+        return new window.XMLHttpRequest();
+    }
+    else
+    {
+        return false;
+    }
+};
 
+/*
+ * DEBUGGING ONLY
+ */
+PIXI.runList = function(item)
+{
+    window.console.log('>>>>>>>>>');
+    window.console.log('_');
+    var safe = 0;
+    var tmp = item.first;
+    window.console.log(tmp);
+
+    while(tmp._iNext)
+    {
+        safe++;
+        tmp = tmp._iNext;
+        window.console.log(tmp);
+    //  console.log(tmp);
+
+        if(safe > 100)
+        {
+            window.console.log('BREAK');
+            break;
+        }
+    }
+};
 
 
 
